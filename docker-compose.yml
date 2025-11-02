@@ -7,6 +7,8 @@ services:
     container_name: eternalegacy_backend
     restart: always
     env_file: .env # .env 파일에서 환경 변수를 주입
+    volumes:
+      - ./backend:/app/backend # <-- ADD THIS LINE
     expose:
       - "8000" # 컨테이너 내부 8000번 포트 (gunicorn이 실행 중)
     networks:
