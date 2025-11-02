@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # 1. EternaLegacy 백엔드 (FastAPI)
+  backend:
+    build: .  # 현재 폴더의 Dockerfile을 사용해 빌드
+    container_name: eternalegacy_backend
+    restart: always
+    env_file: .env # .env 파일에서 환경 변수를 주입
+    expose:
+      - "8000" # 컨테이너 내부 8000번 포트 (gunicorn이 실행 중)
+    networks:
+      - app-network
+
+  # 2. Nginx (리버스 프록시)
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: eternalegacy_nginx
+    restart: always
+    ports:
+      - "80:80"   # 외부 80(HTTP) 포트 개방
+      - "443:443" # 외부 443(HTTPS) 포트 개방
+    volumes:
+      # Nginx 설정 파일을 컨테이너에 연결
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      # Certbot이 인증서를 저장하고 Nginx가 읽을 공유 볼륨
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+    depends_on:
+      - backend # 백엔드보다 나중에 실행
+    networks:
+      - app-network
+
+  # 3. Certbot (SSL 인증서 봇)
+  certbot:
+    image: certbot/certbot:latest
+    container_name: eternalegacy_certbot
+    volumes:
+      # Nginx와 동일한 인증서 볼륨 공유
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      # Certbot이 Nginx에 챌린지 파일을 저장할 웹 루트
+      - ./nginx/certbot-webroot:/var/www/html
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+# Docker 서비스 간 통신을 위한 내부 네트워크
+networks:
+  app-network:
+    driver: bridge
+
+# 인증서를 영구 저장하기 위한 Docker 볼륨
+volumes:
+  certbot-etc:
+  certbot-var:

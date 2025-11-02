@@ -30,3 +30,5 @@ recovery/tmp/
 config/
 
 stripe_backup_code.txt
+
+recovery/EternaLegacy-Key.pem
