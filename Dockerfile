@@ -37,4 +37,5 @@ EXPOSE 8000
 
 # 컨테이너 실행 명령:
 # Gunicorn을 사용해 4개의 Uvicorn 워커로 backend/main.py 안의 'app' 실행
+ENV PYTHONPATH="/app"
 CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "backend.main:app", "--bind", "0.0.0.0:8000"]
