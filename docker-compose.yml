@@ -45,12 +45,7 @@ services:
       - ./nginx/certbot-webroot:/var/www/html
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
-# Docker 서비스 간 통신을 위한 내부 네트워크
-networks:
-  app-network:
-    driver: bridge
-
-# 4. PostgreSQL Database
+  # 4. PostgreSQL Database
 postgres:
   image: postgres:16-alpine
   container_name: eternalegacy_postgres
@@ -60,6 +55,12 @@ postgres:
     - postgres-data:/var/lib/postgresql/data # 데이터 영구 저장
   networks:
     - app-network
+
+# Docker 서비스 간 통신을 위한 내부 네트워크
+networks:
+  app-network:
+    driver: bridge
+
 
 # 인증서를 영구 저장하기 위한 Docker 볼륨  <-- ONLY ONE 'VOLUMES' SECTION REMAINS
 volumes:
