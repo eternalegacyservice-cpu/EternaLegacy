@@ -50,7 +50,19 @@ networks:
   app-network:
     driver: bridge
 
-# 인증서를 영구 저장하기 위한 Docker 볼륨
+# 4. PostgreSQL Database
+postgres:
+  image: postgres:16-alpine
+  container_name: eternalegacy_postgres
+  restart: always
+  env_file: .env
+  volumes:
+    - postgres-data:/var/lib/postgresql/data # 데이터 영구 저장
+  networks:
+    - app-network
+
+# 인증서를 영구 저장하기 위한 Docker 볼륨  <-- ONLY ONE 'VOLUMES' SECTION REMAINS
 volumes:
   certbot-etc:
   certbot-var:
+  postgres-data:
