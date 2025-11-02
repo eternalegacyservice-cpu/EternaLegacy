@@ -1,0 +1,25 @@
+# EternaLegacy (EternaLink) - "프로 버전" 윈도우 작업 스케줄러 해제
+Write-Host "Unregistering EternaLegacy automated tasks..." -ForegroundColor Yellow
+
+$TaskName_Hourly = "EternaLegacy_Hourly"
+$TaskName_Daily = "EternaLegacy_Daily"
+
+try {
+    if (Get-ScheduledTask -TaskName $TaskName_Hourly -ErrorAction SilentlyContinue) {
+        Unregister-ScheduledTask -TaskName $TaskName_Hourly -Confirm:$false
+        Write-Host "[OK] $TaskName_Hourly unregistered." -ForegroundColor Green
+    } else {
+        Write-Host "[INFO] $TaskName_Hourly not found."
+    }
+
+    if (Get-ScheduledTask -TaskName $TaskName_Daily -ErrorAction SilentlyContinue) {
+        Unregister-ScheduledTask -TaskName $TaskName_Daily -Confirm:$false
+        Write-Host "[OK] $TaskName_Daily unregistered." -ForegroundColor Green
+    } else {
+        Write-Host "[INFO] $TaskName_Daily not found."
+    }
+} catch {
+    Write-Warning "[FAIL] Unregistration failed: $_"
+}
+
+Write-Host "All tasks unregistered."
